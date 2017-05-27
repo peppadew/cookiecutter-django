@@ -1,26 +1,26 @@
 from django.conf.urls import url
 
-from . import views
+from user import views
+
 
 urlpatterns = [
     url(
-        regex=r'^$',
-        view=views.UserListView.as_view(),
-        name='list'
+        r'^profile/$',
+        views.UpdateProfile.as_view(
+            template_name="user/edit_profile.html",
+        ),
+        name='edit_profile'
     ),
+
     url(
-        regex=r'^~redirect/$',
-        view=views.UserRedirectView.as_view(),
-        name='redirect'
+        r'^validate-email/$',
+        views.ValidateEmail.as_view(),
+        name='auth_validate_email',
     ),
+
     url(
-        regex=r'^(?P<username>[\w.@+-]+)/$',
-        view=views.UserDetailView.as_view(),
-        name='detail'
-    ),
-    url(
-        regex=r'^~update/$',
-        view=views.UserUpdateView.as_view(),
-        name='update'
+        r'^check-email/$',
+        views.CheckEmail.as_view(),
+        name='auth_check_email',
     ),
 ]

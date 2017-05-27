@@ -1,45 +1,56 @@
-from django.core.urlresolvers import reverse
-from django.views.generic import DetailView, ListView, RedirectView, UpdateView
-
+from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .models import User
+from django.contrib.messages.views import SuccessMessageMixin
+
+from django.http import HttpResponse
+
+from django.views import View
+from django.views.generic.edit import UpdateView
+
+from django.core.urlresolvers import reverse
+
+from user import forms
 
 
-class UserDetailView(LoginRequiredMixin, DetailView):
-    model = User
-    # These next two lines tell the view to index lookups by username
-    slug_field = 'username'
-    slug_url_kwarg = 'username'
-
-
-class UserRedirectView(LoginRequiredMixin, RedirectView):
-    permanent = False
-
-    def get_redirect_url(self):
-        return reverse('users:detail',
-                       kwargs={'username': self.request.user.username})
-
-
-class UserUpdateView(LoginRequiredMixin, UpdateView):
-
-    fields = ['name', ]
-
-    # we already imported User in the view code above, remember?
-    model = User
-
-    # send the user back to their own page after a successful update
-    def get_success_url(self):
-        return reverse('users:detail',
-                       kwargs={'username': self.request.user.username})
+class UpdateProfile(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+    model = get_user_model()
+    form_class = forms.ProfileForm
+    success_message = "Profile updated."
 
     def get_object(self):
-        # Only get the User record for the user making the request
-        return User.objects.get(username=self.request.user.username)
+        return self.model.objects.get(pk=self.request.user.pk)
+
+    def get_success_url(self):
+        return reverse('edit_profile')
 
 
-class UserListView(LoginRequiredMixin, ListView):
-    model = User
-    # These next two lines tell the view to index lookups by username
-    slug_field = 'username'
-    slug_url_kwarg = 'username'
+class ValidateEmail(View):
+
+    def get(self, request, *args, **kwargs):
+        email = request.GET.get('email').strip()
+
+        valid = email is not None and get_user_model().objects.filter(
+            email__iexact=email
+        ).exists()
+
+        if valid:
+            return HttpResponse('false')
+
+        return HttpResponse('true')
+
+
+class CheckEmail(View):
+
+    def get(self, request, *args, **kwargs):
+        email = request.GET.get('email').strip()
+        if not email:
+            email = request.GET.get('username').strip()
+
+        checked = email is not None and get_user_model().objects.filter(
+            email__iexact=email
+        ).exists()
+        if checked:
+            return HttpResponse('true')
+
+        return HttpResponse('false')

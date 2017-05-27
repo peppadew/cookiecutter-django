@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+
+{% if messages %}
+<section>
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+</section>
+{% endif %}
+
+<section id="profile" class="text-grey">
+  <div class="container">
+    <div class="col-md-6 form-border">
+      <h1>Update details</h1>
+      <form id="frm-profile" action="." class="frm" method="post" role="form">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="id_country">First Name</label>
+            {{ form.first_name }}{{ form.first_name.errors }}
+        </div>
+        <div class="form-group">
+            <label for="id_country">Last Name</label>
+            {{ form.last_name }}{{ form.last_name.errors }}
+        </div>
+        <div class="form-group">
+            <label for="id_country">Email</label>
+            {{ form.email }}
+        </div>
+        <div class="form-group">
+            <label for="id_country">Country</label>
+            {{ form.country }}{{ form.country.errors }}
+        </div>
+        <div class="form-group">
+            <label for="id_city">City</label>
+            {{ form.city }}{{ form.city.errors }}
+        </div>
+        <div class="form-group">
+            <label for="id_mobile">Mobile</label>
+            {{ form.mobile_number }}{{ form.mobile_number.errors }}
+        </div>
+        <div class="spacer8"></div>
+        <input class="btn btn-red" id="submit" name="submit" type="submit" value="Update">
+      </form>
+    </div>
+    <div class="col-md-6">
+      <ul>
+        <li><a href="{% url 'account_change_password' %}">Change Password</a></li>
+        {% comment %}
+        <li><a href="{% url 'account_email' %}">Email Addresses</a></li>
+        <li><a href="{% url 'socialaccount_connections' %}">Social accounts</a></li>
+        {% endcomment %}
+      </ul>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block forms %}{% endblock %}
+
+{% block bottom_js %}
+<!-- <script>
+  $(document).ready(function () {
+    $('#frm-profile').validate();
+
+    $(document).on('change', 'input[type="file"]', function () {
+      $(this).parents('form').submit();
+    });
+  });
+</script> -->
+{% endblock %}
